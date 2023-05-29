@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,11 +15,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
 });
+
+Route::get('/', [HomeController::class, 'index'])->name('homepage');
+
+Route::get('/login', function () {
+    if (Auth::check()) {
+        return redirect('/dashboard');
+    } else {
+        // Redirect to login page if user is not logged in
+        // return view('auth.login');
+        return redirect('/admin');
+    }
+})->name('login');
+
+Route::get('/dashboard', [HomeController::class, 'dashboard'])
+    ->middleware('auth')
+    ->name('dashboard');
